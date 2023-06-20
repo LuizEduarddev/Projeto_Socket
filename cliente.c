@@ -29,13 +29,28 @@ int main() {
     }
 
     char message[1024];
-    strcpy(message, "Olá, servidor!");
+    char username[1024];
+    
+    printf("Digite seu nome de usuario: ");
+    gets(username);
 
-    if (send(sock, message, strlen(message), 0) < 0) {
-        perror("Falha no envio");
-        exit(EXIT_FAILURE);
+    while (1)
+    {
+        printf("Digite algo: ");
+        gets(message);
+        
+        if (send(sock, username, strlen(username), 0) < 0) 
+        {
+            perror("Falha no envio");
+            exit(EXIT_FAILURE);
+        } 
+        
+        if (send(sock, message, strlen(message), 0) < 0) 
+        {
+            perror("Falha no envio");
+            exit(EXIT_FAILURE);
+        }    
     }
-    printf("Mensagem enviada para o servidor\n");
 
     close(sock);
     return 0;

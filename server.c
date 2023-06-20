@@ -9,13 +9,14 @@
 #define SERVER_PORT 8080
 
 int main() {
-    int server_socket, new_socket, valread;
+    int server_socket, new_socket, mensagem, user;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
 
     char buffer[1024] = {0};
-    char *response = "Olá, cliente!";
-
+    char usuario[1024] = {0};
+    char response[1024] = {0};
+    int responder = 0;
     if ((server_socket = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         perror("Falha ao criar o socket");
         exit(EXIT_FAILURE);
@@ -40,12 +41,26 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    valread = read(new_socket, buffer, 1024);
-    printf("Mensagem recebida do cliente: %s\n", buffer);
+   while (1) {
+        memset(buffer, 0, sizeof(buffer));
+        memset(usuario, 0, sizeof(usuario));
 
-    send(new_socket, response, strlen(response), 0);
-    printf("Resposta enviada para o cliente\n");
+        int mensagem = read(new_socket, buffer, sizeof(buffer));
+        int user = read(new_socket, usuario, sizeof(usuario));
 
+        if (mensagem > 0 && user > 0) {
+            printf("Mensagem de %s: %s\n", usuario, buffer);
+
+            // Lógica para responder ao cliente
+            strcpy(response, "Resposta do servidor!");
+            if (send(new_socket, response, strlen(response), 0) < 0) {
+                perror("Falha no envio da resposta");
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
+
+    printf("Encerrando a conexao...");
     close(new_socket);
     close(server_socket);
     return 0;
